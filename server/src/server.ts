@@ -1,6 +1,7 @@
 import express from "express";
 import pg from "pg";
 import cors from "cors";
+import path from "path";
 
 const app = express();
 app.use(cors());
@@ -8,6 +9,14 @@ app.use(cors());
 const client = new pg.Client(
   process.env.DATABASE_URL || "postgres://localhost/the_acme_ice_cream_shop_db"
 );
+app.use(express.static(path.join(__dirname, "../../client/dist")));
+app.get("/", async (req, res, next) => {
+  try {
+    res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.get("/api/flavors", async (req, res, next) => {
   try {
@@ -19,8 +28,8 @@ app.get("/api/flavors", async (req, res, next) => {
     res.send({
       data: response.rows,
     });
-  } catch (ex) {
-    next(ex);
+  } catch (error) {
+    next(error);
   }
 });
 
