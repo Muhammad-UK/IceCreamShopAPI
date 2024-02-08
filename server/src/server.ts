@@ -18,7 +18,6 @@ app.get("/", async (req, res, next) => {
     next(error);
   }
 });
-
 app.get("/api/flavors", async (req, res, next) => {
   try {
     const SQL = /*sql*/ `
@@ -29,6 +28,19 @@ app.get("/api/flavors", async (req, res, next) => {
     res.send({
       data: response.rows,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+app.get("/api/flavors/:id", async (req, res, next) => {
+  try {
+    const SQL = /*sql*/ `
+      SELECT *
+      FROM flavors
+      WHERE id = $1
+    `;
+    const response = await client.query(SQL, [req.params.id]);
+    res.send(response.rows);
   } catch (error) {
     next(error);
   }
