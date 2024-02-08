@@ -5,6 +5,7 @@ import path from "path";
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const client = new pg.Client(
   process.env.DATABASE_URL || "postgres://localhost/the_acme_ice_cream_shop_db"
@@ -28,6 +29,32 @@ app.get("/api/flavors", async (req, res, next) => {
     res.send({
       data: response.rows,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/flavors", async (req, res, next) => {
+  try {
+    if (!req.body.name) return next("Error with body name");
+    const SQL = /*sql*/ `
+      INSERT INTO flavors(name) VALUES($1) RETURNING *
+    `;
+    const response = await client.query(SQL, [req.body.name]);
+    res.status(201).send(response.rows[0]);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/flavors/:id", async (req, res, next) => {
+  try {
+    const SQL = /*sql*/ `
+      DELETE FROM flavors
+      WHERE id = $1
+    `;
+    await client.query(SQL, [req.params.id]);
+    res.sendStatus(204);
   } catch (error) {
     next(error);
   }
@@ -59,7 +86,6 @@ const init = async () => {
     INSERT INTO flavors(name) VALUES ('watermelon');
     INSERT INTO flavors(name) VALUES ('cookie dough');
     INSERT INTO flavors(name) VALUES ('cookies n cream');
-
   `;
   await client.query(SQL);
   console.log("Data seeded");
