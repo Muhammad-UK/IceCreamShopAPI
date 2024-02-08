@@ -28,7 +28,12 @@ function App() {
       <h1>Hello Flavors {flavors.length}</h1>
       <ul>
         {flavors.map((flavor) => {
-          return <li key={flavor.id}>{flavor.name}</li>;
+          return (
+            <li key={flavor.id}>
+              {flavor.name}
+              <p>favorite flavor: {!flavor.is_favorite ? "false" : "true"}</p>
+            </li>
+          );
         })}
       </ul>
     </div>

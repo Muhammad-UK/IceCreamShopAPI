@@ -10,6 +10,7 @@ app.use(express.json());
 const client = new pg.Client(
   process.env.DATABASE_URL || "postgres://localhost/the_acme_ice_cream_shop_db"
 );
+
 app.use(express.static(path.join(__dirname, "../../client/dist")));
 app.get("/", async (req, res, next) => {
   try {
@@ -18,6 +19,7 @@ app.get("/", async (req, res, next) => {
     next(error);
   }
 });
+
 app.get("/api/flavors", async (req, res, next) => {
   try {
     const SQL = /*sql*/ `
@@ -46,9 +48,41 @@ app.get("/api/flavors/:id", async (req, res, next) => {
   }
 });
 
+app.put("/api/flavors/:id", async (req, res, next) => {
+  try {
+    if (req.body.name) {
+      const SQL = /*sql*/ `
+          UPDATE flavors
+          SET name = $1
+          WHERE id = $2;
+        `;
+      await client.query(SQL, [req.body.name, req.params.id]);
+    } else if (req.body.is_favorite) {
+      req.body.is_favorite;
+      const SQL = /*sql*/ `
+          UPDATE flavors
+          SET is_favorite = $1
+          WHERE id = $2;
+        `;
+      await client.query(SQL, [req.body.is_favorite, req.params.id]);
+    } else {
+      return next("There was an Error with the body");
+    }
+    const SQL = /*sql*/ `
+      SELECT * 
+      FROM flavors 
+      WHERE id = $1;
+    `;
+    const response = await client.query(SQL, [req.params.id]);
+    res.send(response.rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/api/flavors", async (req, res, next) => {
   try {
-    if (!req.body.name) return next("Error with body name");
+    if (!req.body.name) return next("There was an Error with the body");
     const SQL = /*sql*/ `
       INSERT INTO flavors(name) VALUES($1) RETURNING *
     `;
@@ -82,7 +116,7 @@ const init = async () => {
     CREATE TABLE flavors(
         id SERIAL PRIMARY KEY,
         name VARCHAR(255),
-        is_favorite BOOLEAN,
+        is_favorite BOOLEAN DEFAULT false,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
