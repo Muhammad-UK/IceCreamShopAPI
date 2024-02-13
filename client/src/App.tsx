@@ -47,7 +47,6 @@ function App() {
         },
       });
       const json = await response.json();
-      console.log(json);
       setFlavors([...flavors, json]);
     } catch (error) {
       console.error(error);
@@ -56,6 +55,24 @@ function App() {
   const handleSubmit = async (event: React.FormEvent) => {
     event?.preventDefault();
     if (newFlavor) await createFlavor(newFlavor);
+  };
+
+  const updateFlavor = async (singleFlavor: TFlavorData, boolear: boolean) => {
+    singleFlavor.is_favorite = boolear;
+    try {
+      const response = await fetch(`/api/flavors/${singleFlavor.id}`, {
+        method: "PUT",
+        body: JSON.stringify(singleFlavor),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const json = await response.json();
+      const updatedFlavor = flavors.filter((_flavor) => _flavor.id === json.id);
+      setFlavors([...flavors, ...updatedFlavor]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -79,9 +96,31 @@ function App() {
             <li key={flavor.id}>
               {flavor.name}
               <p>favorite flavor: {!flavor.is_favorite ? "false" : "true"}</p>
-              <button onClick={() => deleteFlavor(flavor)}>
+              <button
+                className="border-solid p-1 hover:bg-indigo-800"
+                onClick={() => deleteFlavor(flavor)}
+              >
                 delete flavor
               </button>
+              {flavor.is_favorite ? (
+                <>
+                  <button
+                    className="border-solid p-1 hover:bg-indigo-800"
+                    onClick={() => updateFlavor(flavor, false)}
+                  >
+                    unfavorite?
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="border-solid p-1 hover:bg-indigo-800"
+                    onClick={() => updateFlavor(flavor, true)}
+                  >
+                    favorite?
+                  </button>
+                </>
+              )}
             </li>
           );
         })}
