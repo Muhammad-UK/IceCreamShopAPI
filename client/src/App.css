@@ -1,0 +1,32 @@
+body {
+  background-color: #123;
+  color: antiquewhite;
+  display: flex;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+div {
+  max-width: 100vh;
+}
+ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+li {
+  border: solid 2px black;
+  padding: 2rem;
+}
+li:hover {
+  background: hsla(210, 50%, 55%, 0.1);
+  cursor: pointer;
+}
+button {
+  background-color: hsla(0, 0%, 0%, 0.2);
+  border: none;
+  border-radius: 2rem;
+  color: antiquewhite;
+  font-size: 1.1rem;
+  padding: 0.5rem 2rem;
+  cursor: pointer;
+}
