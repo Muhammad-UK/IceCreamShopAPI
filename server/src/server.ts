@@ -50,22 +50,7 @@ app.get("/api/flavors/:id", async (req, res, next) => {
 
 app.put("/api/flavors/:id", async (req, res, next) => {
   try {
-    if (!req.body.name && req.body.is_favorite) {
-      req.body.is_favorite;
-      const SQL = /*sql*/ `
-          UPDATE flavors
-          SET is_favorite = $1
-          WHERE id = $2;
-        `;
-      await client.query(SQL, [req.body.is_favorite, req.params.id]);
-    } else if (!req.body.is_favorite && req.body.name) {
-      const SQL = /*sql*/ `
-      UPDATE flavors
-      SET name = $1
-      WHERE id = $2;
-    `;
-      await client.query(SQL, [req.body.name, req.params.id]);
-    } else if (req.body.name && req.body.is_favorite) {
+    if (req.body.name) {
       const SQL = /*sql*/ `
         UPDATE flavors
         SET name = $1, is_favorite = $2
@@ -85,7 +70,7 @@ app.put("/api/flavors/:id", async (req, res, next) => {
       WHERE id = $1;
     `;
     const response = await client.query(SQL, [req.params.id]);
-    res.send(response.rows);
+    res.send(response.rows[0]);
   } catch (error) {
     next(error);
   }

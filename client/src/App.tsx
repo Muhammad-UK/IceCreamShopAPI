@@ -68,8 +68,12 @@ function App() {
         },
       });
       const json = await response.json();
-      const updatedFlavor = flavors.filter((_flavor) => _flavor.id === json.id);
-      setFlavors([...flavors, ...updatedFlavor]);
+      setFlavors((currentFlavors) => {
+        const updatedFlavors = currentFlavors.filter(
+          (_flavor) => _flavor.id !== singleFlavor.id
+        );
+        return [...updatedFlavors, json];
+      });
     } catch (error) {
       console.error(error);
     }
